@@ -117,11 +117,11 @@ class Follow(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=const.INGREDIENT_NAME_LENGTH,
+        max_length=INGREDIENT_NAME_LENGTH,
         verbose_name='Название'
     )
     measurement_unit = models.CharField(
-        max_length=const.INGREDIENT_MEASUREMENT_UNIT_LENGTH,
+        max_length=INGREDIENT_MEASUREMENT_UNIT_LENGTH,
         verbose_name='единица измерения'
     )
 
@@ -146,7 +146,7 @@ class Recipe(models.Model):
         verbose_name='Автор'
     )
     name = models.CharField(
-        max_length=const.RECIPE_NAME_LENGTH,
+        max_length=RECIPE_NAME_LENGTH,
         verbose_name='Название',
     )
     text = models.TextField(
@@ -158,7 +158,7 @@ class Recipe(models.Model):
         help_text='Загрузите изображение рецепта'
     )
     cooking_time = models.PositiveIntegerField(
-        validators=[MinValueValidator(const.RECIPE_MIN_COOKING_TIME)],
+        validators=[MinValueValidator(RECIPE_MIN_COOKING_TIME)],
         verbose_name='Время (мин)'
     )
     tags = models.ManyToManyField(
@@ -178,3 +178,32 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+class Follow(models.Model):
+    author = models.ForeignKey(
+        User,
+        # все пользователи, подписанные на этого автора
+        related_name='author_followes',
+        on_delete=models.CASCADE,
+        verbose_name='Автор',
+    )
+    follower = models.ForeignKey(
+        User,
+        # все авторы, на которых подписан этот пользователь
+        related_name='follower_followes',
+        on_delete=models.CASCADE,
+        verbose_name='Подписчик',
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'follower'],
+                name='unique_author_follower'
+            )
+        ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.follower} подписан на {self.author}'
