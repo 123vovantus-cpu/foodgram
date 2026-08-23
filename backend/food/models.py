@@ -115,3 +115,66 @@ class Follow(models.Model):
     def __str__(self):
         return f'{self.follower} подписан на {self.author}'
 
+class Ingredient(models.Model):
+    name = models.CharField(
+        max_length=const.INGREDIENT_NAME_LENGTH,
+        verbose_name='Название'
+    )
+    measurement_unit = models.CharField(
+        max_length=const.INGREDIENT_MEASUREMENT_UNIT_LENGTH,
+        verbose_name='единица измерения'
+    )
+
+    class Meta:
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
+        ordering = ('name',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='unique_ingredient'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.name}, {self.measurement_unit}'
+
+class Recipe(models.Model):
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор'
+    )
+    name = models.CharField(
+        max_length=const.RECIPE_NAME_LENGTH,
+        verbose_name='Название',
+    )
+    text = models.TextField(
+        verbose_name='Описание',
+    )
+    image = models.ImageField(
+        upload_to='recipes/',
+        verbose_name='Изображение',
+        help_text='Загрузите изображение рецепта'
+    )
+    cooking_time = models.PositiveIntegerField(
+        validators=[MinValueValidator(const.RECIPE_MIN_COOKING_TIME)],
+        verbose_name='Время (мин)'
+    )
+    tags = models.ManyToManyField(
+        'Tag',
+    )
+    ingredients = models.ManyToManyField(
+        'Ingredient',
+        through='RecipeIngredient',
+        related_name='recipes'
+    )
+
+    class Meta:
+        default_related_name = 'recipes'
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        ordering = ['-id']
+
+    def __str__(self):
+        return self.name

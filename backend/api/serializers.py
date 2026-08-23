@@ -7,6 +7,8 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
+from django.db import models    
+
 User = get_user_model()
 
 
@@ -49,3 +51,36 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'name', 'slug')
 
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit')
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='ingredients_in_recipe',
+        verbose_name='Рецепт'
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='ingredients_in_recipe',
+        verbose_name='Продукт'
+    )
+    amount = models.PositiveSmallIntegerField(
+        verbose_name='Мера',
+        help_text='Мера продукта в рецепте'
+    )
+
+    class Meta:
+        verbose_name = 'Продукт в рецепте'
+        verbose_name_plural = 'Продукты в рецепте'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_recipe_ingredient'
+            )
+        ]
