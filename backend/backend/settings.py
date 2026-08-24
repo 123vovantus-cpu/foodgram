@@ -1,15 +1,26 @@
 import os
 from pathlib import Path
+import logging
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.environ.get('SECRET_KEY', 'SECRET_KEY')
+DEBUG = (os.getenv('DEBUG') == 'True')
+#BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-e-ozv70#2=cpq8(*b+qfzmf3x2f2cwlev*0l0&!_ee=m&c!e74'
+
+#SECRET_KEY = 'django-insecure-e-ozv70#2=cpq8(*b+qfzmf3x2f2cwlev*0l0&!_ee=m&c!e74'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+#DEBUG = True
+ 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '130.193.46.70']
 
 
@@ -24,7 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'rest_framework.authtoken',
+    #'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'django_filters',
     'django_extensions',
     'djoser',
@@ -32,6 +44,8 @@ INSTALLED_APPS = [
     'food',
     'api',
 ]
+
+AUTH_USER_MODEL = 'food.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -62,7 +76,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-DATABASES = {
+
+'''if os.getenv('USE_SQLITE', 'False') == 'False':
+    DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.getenv('POSTGRES_DB', 'food'),
@@ -72,6 +88,25 @@ DATABASES = {
             'PORT': os.getenv('DB_PORT', 5432)
         }
     }
+else:'''
+DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+
+'''DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'food'),
+            'USER': os.getenv('POSTGRES_USER', 'food_user'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', ''),
+            'PORT': os.getenv('DB_PORT', 5432)
+        }
+    }'''
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
@@ -113,7 +148,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-AUTH_USER_MODEL = 'food.User'
+
 
 
 # Static files (CSS, JavaScript, Images)

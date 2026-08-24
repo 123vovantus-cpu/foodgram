@@ -2,6 +2,7 @@ from django.shortcuts import render
 import os
 from django.contrib.auth import get_user_model
 from rest_framework import status, viewsets
+
 from food.models import (Favorite, Follow, Ingredient, Recipe,
                          RecipeIngredient, ShoppingCartItem, Tag)
 
@@ -23,10 +24,11 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from django.urls import reverse
 from django_filters import rest_framework as filters
-from food.models import Recipe, Tag
+#from food.models import Recipe, Tag
 from api.pagination import RecipePagination
 from api.permissions import IsAuthorOrReadOnly
 from django_filters.rest_framework.backends import DjangoFilterBackend
+from djoser.views import UserViewSet
 
 User = get_user_model()
 
@@ -43,6 +45,13 @@ class IngredientFilter(FilterSet):
     class Meta:
         model = Ingredient
         fields = ['name']
+
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+    filterset_class = IngredientFilter
 
 class RecipeFilter(filters.FilterSet):
     is_favorited = filters.BooleanFilter(method='filter_is_favorited')
@@ -74,12 +83,7 @@ class RecipeFilter(filters.FilterSet):
         return recipes
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-    permission_classes = [AllowAny]
-    pagination_class = None
-    filterset_class = IngredientFilter
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
@@ -234,4 +238,104 @@ class RecipeViewSet(viewsets.ModelViewSet):
             model=Favorite,
             recipe_id=pk,
             request=request,
+        )
+
+
+class UserWithSubscriptionViewSet(UserViewSet):
+    queryset = User.objects.all()
+    serializer_class = FoodgramUserSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    @action(['get'],
+            detail=False,
+            permission_classes=[IsAuthenticated])
+    def me(self, request, *args, **kwargs):
+        return super().me(request, *args, **kwargs)
+
+    @action(
+        detail=False,
+        methods=['put', 'delete'],
+        url_path='me/avatar',
+        permission_classes=[IsAuthenticated]
+    )
+    def avatar(self, request):
+        user = request.user
+
+        if request.method == 'PUT':
+            avatar = request.data.get('avatar')
+            if not avatar:
+                raise ValidationError({'avatar': ['Это поле обязательно.']})
+
+            user.avatar = FoodgramUserSerializer(
+                context={'request': request}
+            ).fields['avatar'].to_internal_value(avatar)
+
+            user.save()
+
+            return Response(
+                {'avatar': user.avatar.url if user.avatar else None},
+                status=status.HTTP_200_OK)
+
+        # elif request.method == 'DELETE':
+        if (
+                user.avatar
+                and user.avatar.path
+                and os.path.isfile(user.avatar.path)
+        ):
+            try:
+                os.remove(user.avatar.path)
+            except Exception:
+                pass  # подавляем ошибки удаления
+
+        user.avatar = None
+        user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated]
+            )
+    def subscribe(self, request, **kwargs):
+        pk = kwargs['id']
+        user = request.user
+
+        if request.method == 'DELETE':
+            get_object_or_404(Follow,
+                              follower=request.user,
+                              author_id=pk
+                              ).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # if request.method == 'POST':
+        author = get_object_or_404(User, pk=pk)
+
+        if user.id == author.id:
+            raise ValidationError('Нельзя подписаться на самого себя')
+
+        _, created = Follow.objects.get_or_create(
+            follower=user, author=author)
+        if not created:
+            raise ValidationError(
+                f'Вы уже подписаны на пользователя {author.username}')
+
+        serializer = FollowedUserSerializer(
+            author,
+            context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def subscriptions(self, request):
+        authors = User.objects.filter(
+            pk__in=Follow.objects
+            .filter(follower=request.user)
+            .values_list('author__id', flat=True)
+        )
+        paginator = RecipePagination()
+        return paginator.get_paginated_response(
+            FollowedUserSerializer(
+                paginator.paginate_queryset(authors, request),
+                many=True,
+                context={'request': request}
+            ).data
         )
