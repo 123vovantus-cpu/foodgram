@@ -147,7 +147,7 @@ class TagAdmin(admin.ModelAdmin, RecipesCountMixin):
 #    search_fields = ('name', 'measurement_unit')
 #    list_filter = ('measurement_unit', HasRecipesFilter)
 
-#   def get_queryset(self, request):
+#   def get_queryset(self, request): 
 #       queryset = super().get_queryset(request)
 #       return queryset.prefetch_related('recipes')
 
