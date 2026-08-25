@@ -7,8 +7,6 @@ import base64
 import uuid
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from rest_framework import serializers
-from django.db import models    
 from collections import Counter
 
 User = get_user_model()
@@ -35,7 +33,8 @@ class FoodgramUserSerializer(DjoserUserSerializer):
 
     class Meta:
         model = User
-        fields = (*DjoserUserSerializer.Meta.fields, 'avatar', 'is_subscribed')
+        fields = (*DjoserUserSerializer.Meta.fields,
+                'avatar', 'is_subscribed')
         read_only_fields = fields
 
     def get_is_subscribed(self, author):
@@ -44,7 +43,7 @@ class FoodgramUserSerializer(DjoserUserSerializer):
             request
             and not request.user.is_anonymous
             and Follow.objects.filter(author=author,
-                                      follower=request.user).exists()
+                            follower=request.user).exists()
         )
 
 
@@ -183,7 +182,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 'Необходимо указать хотя бы один ингредиент.')
         duplicate_ids = {
             id_ for id_, count in
-            Counter(item['ingredient'].id for item in ingredients).items()
+            Counter(item['ingredient'].id for item in 
+                    ingredients).items()
             if count > 1
         }
         if not duplicate_ids:

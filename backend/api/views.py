@@ -1,34 +1,33 @@
-from django.shortcuts import render
 import os
+
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models import Exists, OuterRef
+from django.http import FileResponse
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.timezone import now
+from django_filters.filters import CharFilter
+from django_filters.filterset import FilterSet
+from django_filters.rest_framework.backends import DjangoFilterBackend
+from djoser.views import UserViewSet
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
 
-from food.models import (Favorite, Follow, Ingredient, Recipe,
-                         RecipeIngredient, ShoppingCartItem, Tag)
-
+from api.pagination import RecipePagination
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (FollowedUserSerializer, FoodgramUserSerializer,
                              IngredientSerializer, RecipeReadSerializer,
                              RecipeWriteSerializer, ShortRecipeSerializer,
                              TagSerializer)
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
-from django_filters.filterset import FilterSet
-from django_filters.filters import CharFilter
-from rest_framework.decorators import action
-from django.http import FileResponse 
-from rest_framework.response import Response
-from django.utils.timezone import now
-from django.db import models
-from django.template.loader import render_to_string 
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404
-from django.urls import reverse
+from food.models import (Favorite, Follow, Ingredient, Recipe,
+                         RecipeIngredient, ShoppingCartItem, Tag)
 from django_filters import rest_framework as filters
-#from food.models import Recipe, Tag
-from api.pagination import RecipePagination
-from api.permissions import IsAuthorOrReadOnly
-from django_filters.rest_framework.backends import DjangoFilterBackend
-from djoser.views import UserViewSet
 
 User = get_user_model()
 
