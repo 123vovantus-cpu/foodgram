@@ -21,7 +21,7 @@ DEBUG = (os.getenv('DEBUG') == 'True')
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
  
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '130.193.46.70']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '130.193.46.70', 'food.2bd.net']
 
 
 # Application definition
