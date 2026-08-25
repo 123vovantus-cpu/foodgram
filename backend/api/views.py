@@ -1,5 +1,11 @@
 import os
 
+from api.pagination import RecipePagination
+from api.permissions import IsAuthorOrReadOnly
+from api.serializers import (FollowedUserSerializer, FoodgramUserSerializer,
+                             IngredientSerializer, RecipeReadSerializer,
+                             RecipeWriteSerializer, ShortRecipeSerializer,
+                             TagSerializer)
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Exists, OuterRef
@@ -7,10 +13,13 @@ from django.http import FileResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.timezone import now
+from django_filters import rest_framework as filters
 from django_filters.filters import CharFilter
 from django_filters.filterset import FilterSet
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from djoser.views import UserViewSet
+from food.models import (Favorite, Follow, Ingredient, Recipe,
+                         RecipeIngredient, ShoppingCartItem, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -18,16 +27,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-
-from api.pagination import RecipePagination
-from api.permissions import IsAuthorOrReadOnly
-from api.serializers import (FollowedUserSerializer, FoodgramUserSerializer,
-                             IngredientSerializer, RecipeReadSerializer,
-                             RecipeWriteSerializer, ShortRecipeSerializer,
-                             TagSerializer)
-from food.models import (Favorite, Follow, Ingredient, Recipe,
-                         RecipeIngredient, ShoppingCartItem, Tag)
-from django_filters import rest_framework as filters
 
 User = get_user_model()
 

@@ -1,13 +1,13 @@
-from djoser.serializers import UserSerializer as DjoserUserSerializer
-from rest_framework import serializers
-from food.models import (Favorite, Follow, Ingredient, Recipe,
-                         RecipeIngredient, ShoppingCartItem, Tag)
-from food.models import User
 import base64
 import uuid
+from collections import Counter
+
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from collections import Counter
+from djoser.serializers import UserSerializer as DjoserUserSerializer
+from food.models import (Favorite, Follow, Ingredient, Recipe,
+                         RecipeIngredient, ShoppingCartItem, Tag, User)
+from rest_framework import serializers
 
 User = get_user_model()
 
