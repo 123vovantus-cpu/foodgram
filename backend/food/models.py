@@ -14,8 +14,8 @@ USER_FIRST_NAME_LENGTH = 150
 USER_LAST_NAME_LENGTH = 150
 USER_USERNAME_LENGTH = 150
 
-RECIPE_MIN_COOKING_TIME = 1  
-INGREDIENT_MIN_AMOUNT = 1  
+RECIPE_MIN_COOKING_TIME = 1
+INGREDIENT_MIN_AMOUNT = 1
 
 
 username_validator = RegexValidator(
@@ -155,6 +155,7 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=INGREDIENT_NAME_LENGTH,
@@ -178,6 +179,7 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(

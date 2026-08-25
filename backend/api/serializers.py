@@ -14,8 +14,9 @@ from collections import Counter
 User = get_user_model()
 
 
-RECIPE_MIN_COOKING_TIME = 1  
-INGREDIENT_MIN_AMOUNT = 1  
+RECIPE_MIN_COOKING_TIME = 1
+INGREDIENT_MIN_AMOUNT = 1
+
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
@@ -26,6 +27,7 @@ class Base64ImageField(serializers.ImageField):
             filename = f'{uuid.uuid4()}.{ext}'
             data = ContentFile(base64.b64decode(imgstr), name=filename)
         return super().to_internal_value(data)
+
 
 class FoodgramUserSerializer(DjoserUserSerializer):
     avatar = Base64ImageField(required=False, allow_null=True)
@@ -45,15 +47,18 @@ class FoodgramUserSerializer(DjoserUserSerializer):
                                       follower=request.user).exists()
         )
 
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('id', 'name', 'slug')
 
+
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
+
 
 class RecipeIngredientReadSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
@@ -61,7 +66,7 @@ class RecipeIngredientReadSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
 
-    
+
 class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientReadSerializer(
@@ -95,6 +100,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, recipe):
         return self.check_user_status(recipe, ShoppingCartItem)
+
 
 class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
@@ -220,8 +226,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                     {'tags': 'Это поле обязательно.'})
 
         return data
-    
-    
+
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
     class Meta:

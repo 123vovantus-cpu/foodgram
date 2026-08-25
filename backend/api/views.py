@@ -32,6 +32,7 @@ from djoser.views import UserViewSet
 
 User = get_user_model()
 
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -46,12 +47,14 @@ class IngredientFilter(FilterSet):
         model = Ingredient
         fields = ['name']
 
+
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny]
     pagination_class = None
     filterset_class = IngredientFilter
+
 
 class RecipeFilter(filters.FilterSet):
     is_favorited = filters.BooleanFilter(method='filter_is_favorited')
@@ -81,8 +84,6 @@ class RecipeFilter(filters.FilterSet):
         if value and not user.is_anonymous:
             return recipes.filter(shoppingcartitems__user=user)
         return recipes
-
-
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

@@ -13,13 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'SECRET_KEY')
 DEBUG = (os.getenv('DEBUG') == 'True')
-#BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-#SECRET_KEY = 'django-insecure-e-ozv70#2=cpq8(*b+qfzmf3x2f2cwlev*0l0&!_ee=m&c!e74'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
  
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '130.193.46.70', 'food.2bd.net']
 
@@ -35,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    #'rest_framework.authtoken',
+    # 'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'django_filters',
     'django_extensions',
@@ -77,24 +70,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-'''if os.getenv('USE_SQLITE', 'False') == 'False':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'food'),
-            'USER': os.getenv('POSTGRES_USER', 'food_user'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432)
-        }
-    }
-else:'''
+
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'food'),
+        'USER': os.getenv('POSTGRES_USER', 'food_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
+}
+
 
 
 '''DATABASES = {
@@ -146,9 +133,6 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
-
-
-
 
 
 # Static files (CSS, JavaScript, Images)

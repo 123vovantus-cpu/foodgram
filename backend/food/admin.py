@@ -140,16 +140,16 @@ class TagAdmin(admin.ModelAdmin, RecipesCountMixin):
     search_fields = ('name', 'slug')
 
 
-#@admin.register(Ingredient)
-#class IngredientAdmin(RecipesCountMixin, admin.ModelAdmin):
+# @admin.register(Ingredient)
+# class IngredientAdmin(RecipesCountMixin, admin.ModelAdmin):
 #    list_display = ('id', 'name', 'measurement_unit',
 #                    *RecipesCountMixin.list_display)
 #    search_fields = ('name', 'measurement_unit')
 #    list_filter = ('measurement_unit', HasRecipesFilter)
 
- #   def get_queryset(self, request):
- #       queryset = super().get_queryset(request)
- #       return queryset.prefetch_related('recipes')
+#   def get_queryset(self, request):
+#       queryset = super().get_queryset(request)
+#       return queryset.prefetch_related('recipes')
 
 
 @admin.register(Favorite, ShoppingCartItem)
@@ -259,4 +259,4 @@ class RecipeAdmin(admin.ModelAdmin):
             f'<img src="{recipe.image.url}" '
             f'style="height: 50px; object-fit: cover; border-radius: 4px;" />'
         )
-        return ''  
+        return ''
