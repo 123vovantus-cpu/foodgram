@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "130.193.46.70", "food.2bd.net", "food.jo3.org"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "130.193.46.70", "food.2bd.net", "food.jo3.org", "backend"]
 
 
 # Application definition
