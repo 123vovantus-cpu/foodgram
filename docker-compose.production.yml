@@ -30,10 +30,9 @@ services:
       - static_volume:/frontend_static
   gateway:
     image: nginx:alpine
-    container_name: gateway
     restart: unless-stopped
     depends_on:
-      backend:
+      - backend
     volumes:
       # Твой конфиг → default.conf, который Nginx точно прочитает
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
