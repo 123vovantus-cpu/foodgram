@@ -15,7 +15,7 @@ services:
     image: vladimirradk/food_back
     env_file: .env
     depends_on:
-      - food_db
+      - db
     volumes:
       - static_volume:/backend_static
       - media_volume:/app/media
