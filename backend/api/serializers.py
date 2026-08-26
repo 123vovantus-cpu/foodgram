@@ -13,7 +13,6 @@ from food.models import (
     RecipeIngredient,
     ShoppingCartItem,
     Tag,
-    User,
 )
 from rest_framework import serializers
 
@@ -49,7 +48,9 @@ class FoodgramUserSerializer(DjoserUserSerializer):
         return (
             request
             and not request.user.is_anonymous
-            and Follow.objects.filter(author=author, follower=request.user).exists()
+            and Follow.objects.filter(
+                author=author, follower=request.user
+            ).exists()
         )
 
 
@@ -68,7 +69,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientReadSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="ingredient.id")
     name = serializers.ReadOnlyField(source="ingredient.name")
-    measurement_unit = serializers.ReadOnlyField(source="ingredient.measurement_unit")
+    measurement_unit = serializers.ReadOnlyField(
+        source="ingredient.measurement_unit"
+    )
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
@@ -103,7 +106,9 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         return (
             request
             and not request.user.is_anonymous
-            and model_class.objects.filter(user=request.user, recipe=recipe).exists()
+            and model_class.objects.filter(
+                user=request.user, recipe=recipe
+            ).exists()
         )
 
     def get_is_favorited(self, recipe):
@@ -141,7 +146,14 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ("ingredients", "tags", "image", "name", "text", "cooking_time")
+        fields = (
+            "ingredients",
+            "tags",
+            "image",
+            "name",
+            "text",
+            "cooking_time",
+        )
 
     def to_representation(self, instance):
         return RecipeReadSerializer(instance, context=self.context).data
@@ -202,18 +214,26 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     def validate_tags(self, tags):
         if not tags:
-            raise serializers.ValidationError("Нужно выбрать хотя бы один тег.")
+            raise serializers.ValidationError(
+                "Нужно выбрать хотя бы один тег."
+            )
 
         duplicate_ids = {
             id_
-            for id_, count in Counter(getattr(tag, "id") for tag in tags).items()
+            for id_, count in Counter(
+                getattr(tag, "id") for tag in tags
+            ).items()
             if count > 1
         }
         if not duplicate_ids:
             return tags
 
-        names = Tag.objects.filter(id__in=duplicate_ids).values_list("name", flat=True)
-        raise serializers.ValidationError(f"Теги не должны повторяться: {names}.")
+        names = Tag.objects.filter(id__in=duplicate_ids).values_list(
+            "name", flat=True
+        )
+        raise serializers.ValidationError(
+            f"Теги не должны повторяться: {names}."
+        )
 
     def validate(self, data):
         request_method = self.context["request"].method
@@ -224,7 +244,9 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                     {"ingredients": "Это поле обязательно."}
                 )
             if "tags" not in data:
-                raise serializers.ValidationError({"tags": "Это поле обязательно."})
+                raise serializers.ValidationError(
+                    {"tags": "Это поле обязательно."}
+                )
 
         return data
 
@@ -243,7 +265,9 @@ class UserSerializer(DjoserUserSerializer):
         user = self.context["request"].user
         return (
             user.is_authenticated
-            and Follow.objects.filter(follower=user, author=followed_user).exists()
+            and Follow.objects.filter(
+                follower=user, author=followed_user
+            ).exists()
         )
 
     class Meta:
@@ -254,7 +278,9 @@ class UserSerializer(DjoserUserSerializer):
 
 class FollowedUserSerializer(UserSerializer):
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.IntegerField(source="recipes.count", read_only=True)
+    recipes_count = serializers.IntegerField(
+        source="recipes.count", read_only=True
+    )
 
     class Meta:
         model = User

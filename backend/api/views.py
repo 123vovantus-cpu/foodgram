@@ -71,7 +71,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeFilter(filters.FilterSet):
     is_favorited = filters.BooleanFilter(method="filter_is_favorited")
-    is_in_shopping_cart = filters.BooleanFilter(method="filter_is_in_shopping_cart")
+    is_in_shopping_cart = filters.BooleanFilter(
+        method="filter_is_in_shopping_cart"
+    )
     tags = filters.ModelMultipleChoiceFilter(
         field_name="tags__slug",
         label="tags",
@@ -149,14 +151,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if not image:
             return Response(
-                {"image": ["Это поле обязательно."]}, status=status.HTTP_400_BAD_REQUEST
+                {"image": ["Это поле обязательно."]},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # Сохраняем текущий путь старого аватара (если есть)
         old_image_path = recipe.image.path if recipe.image else None
 
         # Создаем новый файл аватара, не удаляя пока старый
-        recipe.image = RecipeReadSerializer().fields["image"].to_internal_value(image)
+        recipe.image = (
+            RecipeReadSerializer().fields["image"].to_internal_value(image)
+        )
         recipe.save()
 
         # Удаляем старый файл, если он был и отличается от нового
@@ -178,7 +183,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False, methods=["get"], permission_classes=[IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         user = request.user
         recipes = Recipe.objects.filter(shoppingcartitems__user=user)
@@ -198,7 +205,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             },
         )
 
-        return FileResponse(content, as_attachment=True, filename="shopping_list.txt")
+        return FileResponse(
+            content, as_attachment=True, filename="shopping_list.txt"
+        )
 
     def handle_add_or_remove(self, model, recipe_id, request):
         if request.method not in {"POST", "DELETE"}:
@@ -208,12 +217,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
 
         if request.method == "DELETE":
-            get_object_or_404(model, user=request.user, recipe_id=recipe_id).delete()
+            get_object_or_404(
+                model, user=request.user, recipe_id=recipe_id
+            ).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         # if request.method == 'POST':
         recipe = get_object_or_404(Recipe, pk=recipe_id)
-        obj, created = model.objects.get_or_create(user=request.user, recipe=recipe)
+        obj, created = model.objects.get_or_create(
+            user=request.user, recipe=recipe
+        )
         if not created:
             raise ValidationError(
                 f"Рецепт с id={recipe.id} "
@@ -226,7 +239,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[IsAuthenticated],
     )
     def shopping_cart(self, request, pk=None):
         return self.handle_add_or_remove(
@@ -234,7 +249,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[IsAuthenticated],
     )
     def favorite(self, request, pk=None):
         return self.handle_add_or_remove(
@@ -281,7 +298,11 @@ class UserWithSubscriptionViewSet(UserViewSet):
             )
 
         # elif request.method == 'DELETE':
-        if user.avatar and user.avatar.path and os.path.isfile(user.avatar.path):
+        if (
+            user.avatar
+            and user.avatar.path
+            and os.path.isfile(user.avatar.path)
+        ):
             try:
                 os.remove(user.avatar.path)
             except Exception:
@@ -292,14 +313,18 @@ class UserWithSubscriptionViewSet(UserViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, **kwargs):
         pk = kwargs["id"]
         user = request.user
 
         if request.method == "DELETE":
-            get_object_or_404(Follow, follower=request.user, author_id=pk).delete()
+            get_object_or_404(
+                Follow, follower=request.user, author_id=pk
+            ).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         # if request.method == 'POST':
@@ -310,9 +335,13 @@ class UserWithSubscriptionViewSet(UserViewSet):
 
         _, created = Follow.objects.get_or_create(follower=user, author=author)
         if not created:
-            raise ValidationError(f"Вы уже подписаны на пользователя {author.username}")
+            raise ValidationError(
+                f"Вы уже подписаны на пользователя {author.username}"
+            )
 
-        serializer = FollowedUserSerializer(author, context={"request": request})
+        serializer = FollowedUserSerializer(
+            author, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])

@@ -26,7 +26,9 @@ class HasRelatedObjectsFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "yes":
-            return queryset.filter(**{f"{self.related_name}__isnull": False}).distinct()
+            return queryset.filter(
+                **{f"{self.related_name}__isnull": False}
+            ).distinct()
         if self.value() == "no":
             return queryset.filter(**{f"{self.related_name}__isnull": True})
         return queryset
@@ -163,7 +165,12 @@ class TagAdmin(admin.ModelAdmin, RecipesCountMixin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(RecipesCountMixin, admin.ModelAdmin):
-    list_display = ("id", "name", "measurement_unit", *RecipesCountMixin.list_display)
+    list_display = (
+        "id",
+        "name",
+        "measurement_unit",
+        *RecipesCountMixin.list_display,
+    )
     search_fields = ("name", "measurement_unit")
     list_filter = ("measurement_unit", HasRecipesFilter)
 
@@ -222,7 +229,8 @@ class CookingTimeFilter(admin.SimpleListFilter):
         return [
             (
                 key,
-                f"{value['label']} " f"({self._range_filter(value['range']).count()})",
+                f"{value['label']} "
+                f"({self._range_filter(value['range']).count()})",
             )
             for key, value in self.thresholds.items()
         ]

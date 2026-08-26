@@ -19,7 +19,8 @@ INGREDIENT_MIN_AMOUNT = 1
 username_validator = RegexValidator(
     regex=r"^[\w.@-]+$",
     message=(
-        "Имя пользователя может содержать" " только буквы, цифры и символы @ . - _"
+        "Имя пользователя может содержать"
+        " только буквы, цифры и символы @ . - _"
     ),
 )
 
@@ -30,7 +31,9 @@ class User(AbstractUser):
         max_length=USER_EMAIL_LENGTH,
         verbose_name="Электронная почта",
     )
-    first_name = models.CharField(max_length=USER_FIRST_NAME_LENGTH, verbose_name="Имя")
+    first_name = models.CharField(
+        max_length=USER_FIRST_NAME_LENGTH, verbose_name="Имя"
+    )
     last_name = models.CharField(
         max_length=USER_LAST_NAME_LENGTH, verbose_name="Фамилия"
     )
@@ -89,7 +92,9 @@ class Follow(models.Model):
 
 
 class Recipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор")
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Автор"
+    )
     name = models.CharField(
         max_length=RECIPE_NAME_LENGTH,
         verbose_name="Название",
@@ -141,9 +146,12 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=INGREDIENT_NAME_LENGTH, verbose_name="Название")
+    name = models.CharField(
+        max_length=INGREDIENT_NAME_LENGTH, verbose_name="Название"
+    )
     measurement_unit = models.CharField(
-        max_length=INGREDIENT_MEASUREMENT_UNIT_LENGTH, verbose_name="единица измерения"
+        max_length=INGREDIENT_MEASUREMENT_UNIT_LENGTH,
+        verbose_name="единица измерения",
     )
 
     class Meta:
@@ -182,7 +190,8 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = "Продукты в рецепте"
         constraints = [
             models.UniqueConstraint(
-                fields=["recipe", "ingredient"], name="unique_recipe_ingredient"
+                fields=["recipe", "ingredient"],
+                name="unique_recipe_ingredient",
             )
         ]
 

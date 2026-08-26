@@ -29,10 +29,15 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.CharField(max_length=128, verbose_name="Название")),
+                (
+                    "name",
+                    models.CharField(max_length=128, verbose_name="Название"),
+                ),
                 (
                     "measurement_unit",
-                    models.CharField(max_length=64, verbose_name="единица измерения"),
+                    models.CharField(
+                        max_length=64, verbose_name="единица измерения"
+                    ),
                 ),
             ],
             options={
@@ -53,7 +58,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.CharField(max_length=256, verbose_name="Название")),
+                (
+                    "name",
+                    models.CharField(max_length=256, verbose_name="Название"),
+                ),
                 ("text", models.TextField(verbose_name="Описание")),
                 (
                     "image",
@@ -66,7 +74,9 @@ class Migration(migrations.Migration):
                 (
                     "cooking_time",
                     models.PositiveIntegerField(
-                        validators=[django.core.validators.MinValueValidator(1)],
+                        validators=[
+                            django.core.validators.MinValueValidator(1)
+                        ],
                         verbose_name="Время (мин)",
                     ),
                 ),
@@ -93,7 +103,8 @@ class Migration(migrations.Migration):
                 (
                     "amount",
                     models.PositiveSmallIntegerField(
-                        help_text="Мера продукта в рецепте", verbose_name="Мера"
+                        help_text="Мера продукта в рецепте",
+                        verbose_name="Мера",
                     ),
                 ),
             ],
@@ -141,7 +152,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "slug",
-                    models.SlugField(max_length=32, unique=True, verbose_name="Слаг"),
+                    models.SlugField(
+                        max_length=32, unique=True, verbose_name="Слаг"
+                    ),
                 ),
             ],
             options={
@@ -162,7 +175,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "password",
+                    models.CharField(max_length=128, verbose_name="password"),
+                ),
                 (
                     "last_login",
                     models.DateTimeField(
@@ -196,17 +212,26 @@ class Migration(migrations.Migration):
                 (
                     "date_joined",
                     models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="date joined"
+                        default=django.utils.timezone.now,
+                        verbose_name="date joined",
                     ),
                 ),
                 (
                     "email",
                     models.EmailField(
-                        max_length=254, unique=True, verbose_name="Электронная почта"
+                        max_length=254,
+                        unique=True,
+                        verbose_name="Электронная почта",
                     ),
                 ),
-                ("first_name", models.CharField(max_length=150, verbose_name="Имя")),
-                ("last_name", models.CharField(max_length=150, verbose_name="Фамилия")),
+                (
+                    "first_name",
+                    models.CharField(max_length=150, verbose_name="Имя"),
+                ),
+                (
+                    "last_name",
+                    models.CharField(max_length=150, verbose_name="Фамилия"),
+                ),
                 (
                     "username",
                     models.CharField(
@@ -420,13 +445,15 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="recipeingredient",
             constraint=models.UniqueConstraint(
-                fields=("recipe", "ingredient"), name="unique_recipe_ingredient"
+                fields=("recipe", "ingredient"),
+                name="unique_recipe_ingredient",
             ),
         ),
         migrations.AddConstraint(
             model_name="shoppingcartitem",
             constraint=models.UniqueConstraint(
-                fields=("user", "recipe"), name="shoppingcartitem_unique_user_recipe"
+                fields=("user", "recipe"),
+                name="shoppingcartitem_unique_user_recipe",
             ),
         ),
     ]
