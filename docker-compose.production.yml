@@ -29,13 +29,20 @@ services:
     volumes:
       - static_volume:/frontend_static
   gateway:
-    image: vladimirradk/food_gate
+    image: nginx:alpine
+    container_name: gateway
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
     volumes:
-      - static_volume:/staticfiles/
+      # Твой конфиг → default.conf, который Nginx точно прочитает
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      # Статика и медиа (пути должны совпадать с тем, куда Django их кладёт)
+      - static_volume:/app/static
       - media_volume:/app/media
       - ./docs:/docs
     ports:
-      - 8500:80
-    depends_on:
-      - backend
-    restart: always
+      - "8500:80"
+    networks:
+      - foodgram-network
