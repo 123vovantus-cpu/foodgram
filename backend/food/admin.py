@@ -8,7 +8,6 @@ from .models import (Favorite, Follow, Ingredient, Recipe, RecipeIngredient,
                      ShoppingCartItem, Tag, User)
 
 admin.site.unregister(Group)
-
  
 class HasRelatedObjectsFilter(admin.SimpleListFilter):
     LOOKUP_CHOICES = [('yes', 'Да'), ('no', 'Нет')]
@@ -140,16 +139,16 @@ class TagAdmin(admin.ModelAdmin, RecipesCountMixin):
     search_fields = ('name', 'slug')
 
 
-# @admin.register(Ingredient)
-# class IngredientAdmin(RecipesCountMixin, admin.ModelAdmin):
-#    list_display = ('id', 'name', 'measurement_unit',
-#                    *RecipesCountMixin.list_display)
-#    search_fields = ('name', 'measurement_unit')
-#    list_filter = ('measurement_unit', HasRecipesFilter)
+@admin.register(Ingredient)
+class IngredientAdmin(RecipesCountMixin, admin.ModelAdmin):
+    list_display = ('id', 'name', 'measurement_unit',
+                    *RecipesCountMixin.list_display)
+    search_fields = ('name', 'measurement_unit')
+    list_filter = ('measurement_unit', HasRecipesFilter)
 
-#   def get_queryset(self, request): 
-#       queryset = super().get_queryset(request)
-#       return queryset.prefetch_related('recipes')
+    def get_queryset(self, request):
+       queryset = super().get_queryset(request)
+       return queryset.prefetch_related('recipes')
 
 
 @admin.register(Favorite, ShoppingCartItem)

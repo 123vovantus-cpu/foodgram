@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'SECRET_KEY')
 DEBUG = (os.getenv('DEBUG') == 'True')
- 
+
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '130.193.46.70', 'food.2bd.net']
 
 
@@ -70,7 +70,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -83,17 +82,6 @@ DATABASES = {
 }
 
 
-
-'''DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'food'),
-            'USER': os.getenv('POSTGRES_USER', 'food_user'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432)
-        }
-    }'''
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
@@ -177,4 +165,3 @@ DJOSER = {
     },
     'HIDE_USERS': False,
 }
-
