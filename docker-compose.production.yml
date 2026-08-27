@@ -22,11 +22,11 @@ services:
     volumes:
       - static_volume:/app/collected_static
       - media_volume:/app/media
-  # frontend:
-  #  image: vladimirradk/food_front
-  #  env_file: .env
-  #  restart: unless-stopped
-  #  expose:
+  frontend:
+    image: vladimirradk/food_front
+    env_file: .env
+    restart: unless-stopped
+    expose:
       - "80"
     #command: cp -r /app/build/. /app/collected_static/
     #volumes:
@@ -35,7 +35,6 @@ services:
     image: nginx:alpine
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./frontend/build:/app:ro
       - static_volume:/app/collected_static
       - media_volume:/app/media
       - ./docs:/docs:ro
