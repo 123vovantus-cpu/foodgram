@@ -10,7 +10,7 @@ services:
     volumes:
       - food_data_prod:/var/lib/postgresql/data
   backend:
-    image: babybeardocker/food_back
+    image: vladimirradk/food_back
     env_file: .env
     depends_on:
       - food_db
@@ -18,13 +18,13 @@ services:
       - static_volume:/backend_static
       - media_volume:/app/media
   frontend:
-    image: babybeardocker/food_front
+    image: vladimirradk/food_front
     env_file: .env
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static_volume:/frontend_static
   gateway:
-    image: babybeardocker/food_gate
+    image: vladimirradk/food_gate
     volumes:
       - static_volume:/staticfiles/
       - media_volume:/app/media
