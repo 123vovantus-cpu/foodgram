@@ -25,9 +25,14 @@ services:
   frontend:
     image: vladimirradk/food_front
     env_file: .env
-    command: cp -r /app/build/. /app/collected_static/
-    volumes:
-      - static_volume:/app/collected_static
+    restart: unless-stopped
+    ports:
+      - "3001:80"   # внутренний порт, снаружи не нужен
+    expose:
+      - "80"
+    #command: cp -r /app/build/. /app/collected_static/
+    #volumes:
+    #  - static_volume:/app/collected_static
   gateway:
     image: nginx:alpine
     volumes:
