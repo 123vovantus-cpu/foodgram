@@ -1,41 +1,38 @@
-# Файл docker-compose.production.yml
-
 volumes:
   food_data_prod:
   static_volume:
   media_volume:
 
 services:
-  db:
+  food_db:
     image: postgres:13.10
-    restart: always
     env_file: .env
-    environment:
-      POSTGRES_DB: foodgram
     volumes:
       - food_data_prod:/var/lib/postgresql/data
   backend:
-    image: vladimirradk/food_back
+    image: babybeardocker/food_back
     env_file: .env
     depends_on:
-      - db
+      - food_db
     volumes:
       - static_volume:/backend_static
       - media_volume:/app/media
   frontend:
-    image: vladimirradk/food_front
+    image: babybeardocker/food_front
     env_file: .env
-    command: cp -r /app/build/. /frontend_static
+    command: cp -r /app/build/. /frontend_static/
     volumes:
       - static_volume:/frontend_static
   gateway:
-    image: nginx:alpine
+    image: babybeardocker/food_gate
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro   # <-- важно: в conf.d и с .conf
-      - static_volume:/app/collected_static
+      - static_volume:/staticfiles/
       - media_volume:/app/media
-      - ./docs:/docs:ro
+      - ./docs:/docs
+    # перенаправление всех запросов с порта 8000 хоста
+    # на порт 80 контейнера
     ports:
-      - "8500:80"
-    restart: unless-stopped
-    
+      - 8500:80
+    depends_on:
+      - backend
+    restart: always
