@@ -1,62 +1,109 @@
 server {
-    server_name 89.169.164.5 babybear.myddns.me;
+        #listen 80;
+    server_name bobastate.sytes.net;
 
-    client_max_body_size 50M;
-    
-    location / {
+     location /api/ {
         proxy_set_header Host $http_host;
-        proxy_pass http://127.0.0.1:8500;
+        # Эта команда определяет, куда нужно перенаправить запрос.
+        proxy_pass http://127.0.0.1:8000;
+    }
+
+    location /admin/ {
+        proxy_set_header Host $http_host;
+        proxy_pass http://127.0.0.1:8000;
+    }
+
+
+    location / {
+
+        proxy_set_header Host $http_host;
+        proxy_pass http://127.0.0.1:8000;
+        #root   /var/www/taski;
+        #index  index.html index.htm;
+        #try_files $uri /index.html;
     }
 
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/babybear.myddns.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/babybear.myddns.me/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/bobastate.sytes.net/fullchain.pem; # managed by Certbot
+ ssl_certificate_key /etc/letsencrypt/live/bobastate.sytes.net/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
-
 server {
-    if ($host = babybear.myddns.me) {
+    if ($host = bobastate.sytes.net) {
         return 301 https://$host$request_uri;
-    } # managed by Certbot
-    server_name  babybear.myddns.me;
+   } # managed by Certbot
+
+
+
     listen 80;
-    server_tokens off;
+    server_name bobastate.sytes.net;
     return 404; # managed by Certbot
+
+
 }
 
 server {
-    server_name catsonlynodogs.myddns.me;
+#       listen 8080;
+     server_name kittyand.work.gd;
+        client_max_body_size 50M;
 
-    client_max_body_size 50M;
+     #location /media/ {
+      #  alias /var/www/kittygram/media/;
+   #}
 
-    location / {
+     location /api/ {
+        proxy_set_header Host $http_host;
+        # Эта команда определяет, куда нужно перенаправить запрос.
+        proxy_pass http://127.0.0.1:9000;
+     }
+
+     location /admin/ {
         proxy_set_header Host $http_host;
         proxy_pass http://127.0.0.1:9000;
+     }
+
+     location / {
+        proxy_set_header Host $http_host;
+        proxy_pass http://127.0.0.1:9000;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+
+
+     #root   /var/www/kittygram;
+        #index  index.html index.htm;
+        #try_files $uri /index.html;
     }
 
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/catsonlynodogs.myddns.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/catsonlynodogs.myddns.me/privkey.pem; # managed by Certbot
+   listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/kittyand.work.gd/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/kittyand.work.gd/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
 }
 
-server {
-    if ($host = catsonlynodogs.myddns.me) {
+
+
+    server {
+    if ($host = kittyand.work.gd) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
-    server_name catsonlynodogs.myddns.me;
+
+
     listen 80;
-    server_tokens off;
+    server_name kittyand.work.gd;
     return 404; # managed by Certbot
+
 }
 
+
 server {
-    server_name web-larek.myddns.me;
+    server_name food.jo3.org;
 
 
     root /var/www/larek;
@@ -66,17 +113,18 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/web-larek.myddns.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/web-larek.myddns.me/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    listen 443 ssl http2;
+    server_name food.jo3.org;
+
+    ssl_certificate /etc/letsencrypt/live/food.jo3.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/food.jo3.org/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
 }
 
-
 server {
-    if ($host = web-larek.myddns.me) {
+    if ($host = food.jo3.org) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
@@ -85,3 +133,4 @@ server {
     server_name web-larek.myddns.me;
     return 404; # managed by Certbot
 }
+
