@@ -31,7 +31,8 @@ services:
   gateway:
     image: nginx:alpine
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro   # <-- важно: в conf.d и с .conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/build:/app:ro
       - static_volume:/app/collected_static
       - media_volume:/app/media
       - ./docs:/docs:ro
