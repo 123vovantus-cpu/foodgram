@@ -6,5 +6,5 @@ RUN npm install --legacy-peer-deps
 COPY . ./
 RUN npm run build
 #CMD cp -r build result_build
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend.wsgi"]
-#CMD ["npx", "-y", "http-server", "-p", "8000", "/app/build"]
+#CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend.wsgi"]
+CMD ["npx", "-y", "http-server", "-p", "8000", "/app/build"]
