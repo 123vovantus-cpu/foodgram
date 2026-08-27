@@ -54,6 +54,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "backend.urls"
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://food.jo3.org',
+    'https://www.jo3.org',
+]
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
