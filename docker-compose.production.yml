@@ -25,9 +25,9 @@ services:
   frontend:
     image: vladimirradk/food_front
     env_file: .env
-    command: cp -r /app/build/. /frontend_static/
+    command: cp -r /app/build/. /app/collected_static/
     volumes:
-      - static_volume:/frontend_static
+      - static_volume:/app/collected_static
   gateway:
     image: nginx:alpine
     volumes:
