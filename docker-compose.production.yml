@@ -25,22 +25,17 @@ services:
   frontend:
     image: vladimirradk/food_front
     env_file: .env
-    restart: unless-stopped
-    expose:
-      - "80"
-    #command: cp -r /app/build/. /app/collected_static/
-    #volumes:
-    #  - static_volume:/app/collected_static
+    command: cp -r /app/build/. /app/collected_static/
+    volumes:
+      - static_volume:/app/collected_static
   gateway:
     image: nginx:alpine
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - /etc/letsencrypt/live/food.jo3.org:/etc/nginx/ssl:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro   # <-- важно: в conf.d и с .conf
       - static_volume:/app/collected_static
       - media_volume:/app/media
       - ./docs:/docs:ro
     ports:
       - "8500:80"
-      - "443:443"  
     restart: unless-stopped
     
