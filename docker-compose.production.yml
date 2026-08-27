@@ -22,13 +22,11 @@ services:
     volumes:
       - static_volume:/app/collected_static
       - media_volume:/app/media
-  frontend:
-    image: vladimirradk/food_front
-    env_file: .env
-    restart: unless-stopped
-    ports:
-      - "3001:80"   # внутренний порт, снаружи не нужен
-    expose:
+  # frontend:
+  #  image: vladimirradk/food_front
+  #  env_file: .env
+  #  restart: unless-stopped
+  #  expose:
       - "80"
     #command: cp -r /app/build/. /app/collected_static/
     #volumes:
