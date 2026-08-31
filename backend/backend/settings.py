@@ -57,6 +57,7 @@ ROOT_URLCONF = "backend.urls"
 CSRF_TRUSTED_ORIGINS = [
     'https://food.jo3.org',
     'https://www.jo3.org',
+    'http://158.160.165.233:8500',
 ]
 
 TEMPLATES = [
