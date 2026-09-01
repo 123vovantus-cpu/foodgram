@@ -31,8 +31,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
-    # 'rest_framework.authtoken',
-    "rest_framework_simplejwt",
+    "rest_framework.authtoken",
+    # "rest_framework_simplejwt",
     "django_filters",
     "django_extensions",
     "djoser",
@@ -153,7 +153,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PAGINATION_CLASS": "api.pagination.RecipePagination",
     "PAGE_SIZE": 6,
@@ -175,28 +175,4 @@ DJOSER = {
         "token_refresh": ["rest_framework.permissions.AllowAny"],
     },
     "HIDE_USERS": False,
-    "TOKEN_MODEL": None,
-}
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "UPDATE_LAST_LOGIN": False,
-
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
-    "VERIFYING_KEY": None,
-    "AUDIENCE": None,
-    "ISSUER": None,
-
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_HEADER_PREFIX": "Bearer",
-    "USER_ID_FIELD": "id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication_default_user_authentication_rule",
-
-    "SLIDING_WINDOW_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_WINDOW_LIFETIME": timedelta(minutes=10),
-    "TOKEN_TYPE_CLAIM": "token_type",
 }
