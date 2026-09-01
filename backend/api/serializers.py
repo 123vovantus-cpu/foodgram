@@ -126,6 +126,10 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
         min_value=INGREDIENT_MIN_AMOUNT,
     )
 
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'amount')
+
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientWriteSerializer(
