@@ -175,6 +175,7 @@ DJOSER = {
         "token_refresh": ["rest_framework.permissions.AllowAny"],
     },
     "HIDE_USERS": False,
+    "TOKEN_MODEL": None,
 }
 
 SIMPLE_JWT = {
