@@ -178,7 +178,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         user = request.user
 
-    # Получаем все ингредиенты из корзины пользователя с суммарным количеством
         ingredients = (
             RecipeIngredient.objects
             .filter(recipe__shoppingcartitems__user=user)
