@@ -191,7 +191,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipes = Recipe.objects.filter(shoppingcartitems__user=user)
 
         content = render_to_string(
-            "shopping_list.txt",
+            "list.txt",
             {
                 "user": user,
                 "date": now().date(),
@@ -206,7 +206,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
         return FileResponse(
-            content, as_attachment=True, filename="shopping_list.txt"
+            content, as_attachment=True, filename="list.txt"
         )
 
     def handle_add_or_remove(self, model, recipe_id, request):
