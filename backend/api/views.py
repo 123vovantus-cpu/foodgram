@@ -204,6 +204,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             "Список покупок",
             f"Дата: {timezone.now().date().strftime('%d.%m.%Y')}",
             f"Пользователь: {user.username}",
+            f"Рецепт: {recipes}",
             "",
         ]
         for item in ingredients:
