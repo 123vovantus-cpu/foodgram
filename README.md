@@ -1,23 +1,6 @@
-Находясь в папке infra, выполните команду docker-compose up. При выполнении этой команды контейнер frontend, описанный в docker-compose.yml, подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
-
-По адресу http://localhost изучите фронтенд веб-приложения, а по адресу http://localhost/api/docs/ — спецификацию API.
-
-dh
-
 Foodgram
 Онлайн‑платформа для публикации и поиска рецептов. Пользователи могут регистрироваться, добавлять рецепты, фильтровать по тегам, добавлять в избранное и формировать список покупок.
 
-Ссылки
-Технологии
-Python, Django, Django REST Framework, PostgreSQL, React, Docker, Nginx, Gunicorn, GitHub Actions (CI/CD).
-
-Архитектура
-Backend — Django + DRF (REST API)
-Frontend — React (production build)
-БД — PostgreSQL
-Веб‑сервер — Gunicorn + Nginx
-Деплой — GitHub Actions → Docker Hub → SSH на сервер
-Деплой на сервер
 1. Подготовка сервера
 bash
 # подключение по SSH
@@ -38,19 +21,19 @@ DB_PORT=5432
 SECRET_KEY=ваш_секретный_ключ
 DEBUG=False
 ALLOWED_HOSTS=food.jo3.org,127.0.0.1,localhost
+
 2. Запуск контейнеров
 bash
 cd ~/foodgram
 docker compose -f docker-compose.production.yml up -d
+
 3. Инициализация проекта
 bash
 # миграции и суперпользователь
 docker compose exec backend python manage.py migrate
 docker compose exec backend python manage.py createsuperuser
 
-# загрузка данных
-docker compose exec backend python manage.py load_ingredients_json ingredients.json
-docker compose exec backend python manage.py load_tags_json tags.json
+
 4. GitHub Actions (CI/CD)
 В Settings → Secrets and variables → Actions добавьте:
 

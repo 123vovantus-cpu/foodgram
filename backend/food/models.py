@@ -65,14 +65,12 @@ class User(AbstractUser):
 class Follow(models.Model):
     author = models.ForeignKey(
         User,
-        # все пользователи, подписанные на этого автора
         related_name="author_followes",
         on_delete=models.CASCADE,
         verbose_name="Автор",
     )
     follower = models.ForeignKey(
         User,
-        # все авторы, на которых подписан этот пользователь
         related_name="follower_followes",
         on_delete=models.CASCADE,
         verbose_name="Подписчик",

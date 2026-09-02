@@ -12,13 +12,9 @@ from api.serializers import (
     TagSerializer,
 )
 from django.contrib.auth import get_user_model
-# from django.db import models
 from django.db.models import Exists, OuterRef, Sum
-# from django.http import FileResponse
 from django.http import HttpResponse
-# from django.template.loader import render_to_string
 from django.urls import reverse
-# from django.utils.timezone import now
 from django.utils import timezone
 from django_filters import rest_framework as filters
 from django_filters.filters import CharFilter
@@ -156,25 +152,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {"image": ["Это поле обязательно."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        # Сохраняем текущий путь старого аватара (если есть)
         old_image_path = recipe.image.path if recipe.image else None
-
-        # Создаем новый файл аватара, не удаляя пока старый
         recipe.image = (
             RecipeReadSerializer().fields["image"].to_internal_value(image)
         )
         recipe.save()
-
-        # Удаляем старый файл, если он был и отличается от нового
         if old_image_path and os.path.isfile(old_image_path):
             try:
-                # Проверяем, что новый файл не совпадает с удаляемым
                 if old_image_path != recipe.image.path:
                     os.remove(old_image_path)
             except Exception:
-                # На всякий случай подавляем ошибку удаления,
-                # чтобы не ломать ответ
                 pass
 
         return Response(
@@ -190,7 +177,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         user = request.user
-        recipes = Recipe.objects.filter(shoppingcartitems__user=user)
+
+    # Получаем все ингредиенты из корзины пользователя с суммарным количеством
+        ingredients = (
+            RecipeIngredient.objects
+            .filter(recipe__shoppingcartitems__user=user)
+            .values("ingredient__name", "ingredient__measurement_unit")
+            .annotate(total_amount=Sum("amount"))
+            .order_by("ingredient__name")
+        )
 
         lines = [
             "Список покупок",
@@ -199,26 +194,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             "",
         ]
 
-        for recipe in recipes:
-            lines.append(f"Рецепт: {recipe.name}")
-            lines.append("")
-
-            ingredients = (
-                RecipeIngredient.objects
-                .filter(recipe=recipe)
-                .values("ingredient__name", "ingredient__measurement_unit")
-                .annotate(total_amount=Sum("amount"))
-                .order_by("ingredient__name")
+        for item in ingredients:
+            lines.append(
+                f"{item['ingredient__name']} "
+                f"({item['ingredient__measurement_unit']}) — "
+                f"{item['total_amount']}"
             )
-
-            for item in ingredients:
-                lines.append(
-                    f"{item['ingredient__name']} "
-                    f"({item['ingredient__measurement_unit']}) — "
-                    f"{item['total_amount']}"
-                )
-
-            lines.append("")
 
         content = "\n".join(lines)
         response = HttpResponse(
@@ -241,8 +222,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 model, user=request.user, recipe_id=recipe_id
             ).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-        # if request.method == 'POST':
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         obj, created = model.objects.get_or_create(
             user=request.user, recipe=recipe
@@ -317,7 +296,6 @@ class UserWithSubscriptionViewSet(UserViewSet):
                 status=status.HTTP_200_OK,
             )
 
-        # elif request.method == 'DELETE':
         if (
             user.avatar
             and user.avatar.path
@@ -326,7 +304,7 @@ class UserWithSubscriptionViewSet(UserViewSet):
             try:
                 os.remove(user.avatar.path)
             except Exception:
-                pass  # подавляем ошибки удаления
+                pass
 
         user.avatar = None
         user.save()
