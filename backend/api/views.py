@@ -12,12 +12,14 @@ from api.serializers import (
     TagSerializer,
 )
 from django.contrib.auth import get_user_model
-from django.db import models
-from django.db.models import Exists, OuterRef
-from django.http import FileResponse
+# from django.db import models
+from django.db.models import Exists, OuterRef, Sum
+# from django.http import FileResponse
+from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.timezone import now
+from django.utils import timezone
 from django_filters import rest_framework as filters
 from django_filters.filters import CharFilter
 from django_filters.filterset import FilterSet
@@ -190,24 +192,35 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         recipes = Recipe.objects.filter(shoppingcartitems__user=user)
 
-        content = render_to_string(
-            "list.txt",
-            {
-                "user": user,
-                "date": now().date(),
-                "ingredients": (
-                    RecipeIngredient.objects.filter(recipe__in=recipes)
-                    .values("ingredient__name", "ingredient__measurement_unit")
-                    .annotate(total_amount=models.Sum("amount"))
-                    .order_by("ingredient__name")
-                ),
-                "recipes": recipes,
-            },
+        ingredients = (
+            RecipeIngredient.objects
+            .filter(recipe__in=recipes)
+            .values("ingredient__name", "ingredient__measurement_unit")
+            .annotate(total_amount=Sum("amount"))
+            .order_by("ingredient__name")
         )
 
-        return FileResponse(
-            content, as_attachment=True, filename="list.txt"
+        lines = [
+            "Список покупок",
+            f"Дата: {timezone.now().date().strftime('%d.%m.%Y')}",
+            f"Пользователь: {user.username}",
+            "",
+        ]
+        for item in ingredients:
+            lines.append(
+                f"{item['ingredient__name']} "
+                f"({item['ingredient__measurement_unit']}) — "
+                f"{item['total_amount']}"
+            )
+
+        content = "\n".join(lines)
+        response = HttpResponse(
+            content, content_type="text/plain; charset=utf-8"
         )
+        response["Content-Disposition"] = (
+            'attachment; filename="shopping_list.txt"'
+        )
+        return response
 
     def handle_add_or_remove(self, model, recipe_id, request):
         if request.method not in {"POST", "DELETE"}:
