@@ -192,27 +192,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         recipes = Recipe.objects.filter(shoppingcartitems__user=user)
 
-        ingredients = (
-            RecipeIngredient.objects
-            .filter(recipe__in=recipes)
-            .values("ingredient__name", "ingredient__measurement_unit")
-            .annotate(total_amount=Sum("amount"))
-            .order_by("ingredient__name")
-        )
-
         lines = [
             "Список покупок",
             f"Дата: {timezone.now().date().strftime('%d.%m.%Y')}",
             f"Пользователь: {user.username}",
-            f"Рецепт: {recipes}",
             "",
         ]
-        for item in ingredients:
-            lines.append(
-                f"{item['ingredient__name']} "
-                f"({item['ingredient__measurement_unit']}) — "
-                f"{item['total_amount']}"
+
+        for recipe in recipes:
+            lines.append(f"Рецепт: {recipe.name}")
+            lines.append("")
+
+            ingredients = (
+                RecipeIngredient.objects
+                .filter(recipe=recipe)
+                .values("ingredient__name", "ingredient__measurement_unit")
+                .annotate(total_amount=Sum("amount"))
+                .order_by("ingredient__name")
             )
+
+            for item in ingredients:
+                lines.append(
+                    f"{item['ingredient__name']} "
+                    f"({item['ingredient__measurement_unit']}) — "
+                    f"{item['total_amount']}"
+                )
+
+            lines.append("")
 
         content = "\n".join(lines)
         response = HttpResponse(
