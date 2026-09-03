@@ -85,8 +85,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         source="ingredients_in_recipe", many=True
     )
     author = FoodgramUserSerializer()
-    tags = TagSerializer(many=True)
-
+    
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -167,6 +166,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         return RecipeReadSerializer(instance, context=self.context).data
 
+    @staticmethod
     def create_ingredients(self, ingredients, recipe):
         RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
@@ -297,10 +297,16 @@ class FollowedUserSerializer(UserSerializer):
         read_only_fields = fields
 
     def get_recipes(self, obj):
+        limit_param = self.context["request"].GET.get("recipes_limit")
+        try:
+            limit = int(limit_param) if limit_param else None
+        except (ValueError, TypeError):
+            limit = None
+        qs = obj.recipes.all()
+        if limit is not None and limit > 0:
+            qs = qs[:limit]
         return ShortRecipeSerializer(
-            obj.recipes.all()[
-                : int(self.context["request"].GET.get("recipes_limit", 10**10))
-            ],
+            qs,
             many=True,
             context=self.context,
         ).data
