@@ -85,7 +85,6 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         source="ingredients_in_recipe", many=True
     )
     author = FoodgramUserSerializer()
-    
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
