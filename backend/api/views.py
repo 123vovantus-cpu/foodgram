@@ -12,13 +12,10 @@ from api.serializers import (
     TagSerializer,
 )
 from django.contrib.auth import get_user_model
-from django.db.models import Exists, OuterRef, Sum
+from django.db.models import Exists, OuterRef
 from django.http import HttpResponse
 from django.urls import reverse
-from django.utils import timezone
-from django_filters import rest_framework as filters
-from django_filters.filters import CharFilter
-from django_filters.filterset import FilterSet
+# from django.utils import timezone
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from djoser.views import UserViewSet
 from food.models import (
@@ -26,7 +23,6 @@ from food.models import (
     Follow,
     Ingredient,
     Recipe,
-    RecipeIngredient,
     ShoppingCartItem,
     Tag,
 )
@@ -34,12 +30,11 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+
+from api.filters import IngredientFilter, RecipeFilter
+from food.services import generate_shopping_list_text
 
 User = get_user_model()
 
@@ -51,50 +46,12 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class IngredientFilter(FilterSet):
-    name = CharFilter(field_name="name", lookup_expr="istartswith")
-
-    class Meta:
-        model = Ingredient
-        fields = ["name"]
-
-
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny]
     pagination_class = None
     filterset_class = IngredientFilter
-
-
-class RecipeFilter(filters.FilterSet):
-    is_favorited = filters.BooleanFilter(method="filter_is_favorited")
-    is_in_shopping_cart = filters.BooleanFilter(
-        method="filter_is_in_shopping_cart"
-    )
-    tags = filters.ModelMultipleChoiceFilter(
-        field_name="tags__slug",
-        label="tags",
-        to_field_name="slug",
-        queryset=Tag.objects.all(),
-    )
-
-    class Meta:
-        model = Recipe
-        fields = ["author", "tags"]
-
-    def filter_is_favorited(self, recipes, name, value):
-        user = self.request.user
-        if value and not user.is_anonymous:
-
-            return recipes.filter(favorites__user=user)
-        return recipes
-
-    def filter_is_in_shopping_cart(self, recipes, name, value):
-        user = self.request.user
-        if value and not user.is_anonymous:
-            return recipes.filter(shoppingcartitems__user=user)
-        return recipes
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -177,30 +134,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         user = request.user
+        content = generate_shopping_list_text(user)
 
-        ingredients = (
-            RecipeIngredient.objects
-            .filter(recipe__shoppingcartitems__user=user)
-            .values("ingredient__name", "ingredient__measurement_unit")
-            .annotate(total_amount=Sum("amount"))
-            .order_by("ingredient__name")
-        )
-
-        lines = [
-            "Список покупок",
-            f"Дата: {timezone.now().date().strftime('%d.%m.%Y')}",
-            f"Пользователь: {user.username}",
-            "",
-        ]
-
-        for item in ingredients:
-            lines.append(
-                f"{item['ingredient__name']} "
-                f"({item['ingredient__measurement_unit']}) — "
-                f"{item['total_amount']}"
-            )
-
-        content = "\n".join(lines)
         response = HttpResponse(
             content, content_type="text/plain; charset=utf-8"
         )
@@ -221,6 +156,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 model, user=request.user, recipe_id=recipe_id
             ).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         obj, created = model.objects.get_or_create(
             user=request.user, recipe=recipe
@@ -324,7 +260,6 @@ class UserWithSubscriptionViewSet(UserViewSet):
             ).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # if request.method == 'POST':
         author = get_object_or_404(User, pk=pk)
 
         if user.id == author.id:
