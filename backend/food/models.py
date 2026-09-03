@@ -47,6 +47,7 @@ class User(AbstractUser):
         upload_to="avatars/",
         null=True,
         blank=True,
+        default="",
         verbose_name="Аватар",
     )
 
@@ -80,7 +81,11 @@ class Follow(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["author", "follower"], name="unique_author_follower"
-            )
+            ),
+            models.CheckConstraint(
+                check=~models.Q(author=models.F("follower")),
+                name="no_self_follow",
+            ),
         ]
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
@@ -120,7 +125,7 @@ class Recipe(models.Model):
         default_related_name = "recipes"
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
-        ordering = ["-id"]
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -180,7 +185,8 @@ class RecipeIngredient(models.Model):
         verbose_name="Продукт",
     )
     amount = models.PositiveSmallIntegerField(
-        verbose_name="Мера", help_text="Мера продукта в рецепте"
+        verbose_name="Мера", help_text="Мера продукта в рецепте",
+        validators=[MinValueValidator(INGREDIENT_MIN_AMOUNT)],
     )
 
     class Meta:
