@@ -1,9 +1,8 @@
 import json
 from django.core.management.base import BaseCommand
 
-
 class BaseLoadCommand(BaseCommand):
-    model = None  # установить в дочернем классе
+    model = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -23,7 +22,7 @@ class BaseLoadCommand(BaseCommand):
                 )
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f'Добавлено {len(created)} объектов из файла "{file_path}"'
+                        f'Добавлено {len(created)} объектов "{file_path}"'
                     )
                 )
         except FileNotFoundError:
@@ -33,4 +32,4 @@ class BaseLoadCommand(BaseCommand):
         except Exception as e:
             self.stderr.write(self.style.ERROR(
                 f'Ошибка при обработке файла {file_path}: {e}'
-            ))  
+            ))
