@@ -5,6 +5,7 @@ from collections import Counter
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer as DjoserUserSerializer
+from food.constants import INGREDIENT_MIN_AMOUNT, RECIPE_MIN_COOKING_TIME
 from food.models import (
     Favorite,
     Follow,
@@ -17,10 +18,6 @@ from food.models import (
 from rest_framework import serializers
 
 User = get_user_model()
-
-
-RECIPE_MIN_COOKING_TIME = 1
-INGREDIENT_MIN_AMOUNT = 1
 
 
 class Base64ImageField(serializers.ImageField):
@@ -166,7 +163,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return RecipeReadSerializer(instance, context=self.context).data
 
     @staticmethod
-    def create_ingredients(self, ingredients, recipe):
+    def create_ingredients(ingredients, recipe):
         RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
                 recipe=recipe,

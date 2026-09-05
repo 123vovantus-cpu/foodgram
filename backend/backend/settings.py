@@ -16,7 +16,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
-# ALLOWED_HOSTS = ["localhost", "127.0.0.1", "158.160.165.233", "food.2bd.net", "food.jo3.org", "backend"]
 ALLOWED_HOSTS_RAW = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_RAW.split(",") if host.strip()]
 
@@ -43,6 +42,7 @@ AUTH_USER_MODEL = "food.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -119,11 +119,6 @@ STATIC_ROOT = BASE_DIR / "collected_static"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [

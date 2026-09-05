@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
+from food.constants import INGREDIENT_MIN_AMOUNT, RECIPE_MIN_COOKING_TIME
+
 INGREDIENT_NAME_LENGTH = 128
 INGREDIENT_MEASUREMENT_UNIT_LENGTH = 64
 RECIPE_NAME_LENGTH = 256
@@ -11,9 +13,6 @@ USER_EMAIL_LENGTH = 254
 USER_FIRST_NAME_LENGTH = 150
 USER_LAST_NAME_LENGTH = 150
 USER_USERNAME_LENGTH = 150
-
-RECIPE_MIN_COOKING_TIME = 1
-INGREDIENT_MIN_AMOUNT = 1
 
 
 username_validator = RegexValidator(
@@ -89,6 +88,7 @@ class Follow(models.Model):
         ]
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
+        ordering = ("author", "follower")
 
     def __str__(self):
         return f"{self.follower} подписан на {self.author}"
@@ -192,6 +192,7 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = "Продукт в рецепте"
         verbose_name_plural = "Продукты в рецепте"
+        ordering = ("recipe", "ingredient")
         constraints = [
             models.UniqueConstraint(
                 fields=["recipe", "ingredient"],
@@ -205,17 +206,19 @@ class UserRecipeRelationBase(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
-        related_name="%(class)ss",
-    )
+        )
+        
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name="Рецепт",
-        related_name="%(class)ss",
-    )
+        )
 
+        
     class Meta:
         abstract = True
+        default_related_name = "%(class)ss"
+        ordering = ("user", "recipe")
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "recipe"], name="%(class)s_unique_user_recipe"
